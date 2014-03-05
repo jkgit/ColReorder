@@ -763,8 +763,27 @@ ColReorder.prototype = {
 	{
 		var that = this;
 		$(nTh).on( 'mousedown.ColReorder', function (e) {
-			e.preventDefault();
-			that._fnMouseDown.call( that, e, nTh );
+			e.preventDefault();var isResizing = false;
+			
+			if (that.s.dt._ColResize !== undefined) {
+				/* If resize is enabled, check to be sure this isn't a resize event (not on the border), would
+				   be better to check a class to see if resize has already claimed the event, but no guarantee that resize
+				   will fire first */
+				   
+				/* Store information about the mouse position */
+	      		var nThTarget = e.target.nodeName == "TH" ? e.target : $(e.target).parents('TH')[0];
+	      		var offset = $(nThTarget).offset();             
+	      		var nLength = $(nThTarget).innerWidth();  
+	      		                                               
+		        /* are we on the col border (if not, reorder col) */     
+		        if (Math.abs(e.pageX - Math.round(offset.left + nLength)) <= 5) {
+		        	isResizing = true;
+				}
+			}
+			
+			if (!isResizing) {
+				that._fnMouseDown.call( that, e, nTh );
+			}
 		} );
 	},
 
